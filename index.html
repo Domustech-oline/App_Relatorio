@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <title>App Ocorrências</title>
 
@@ -421,6 +421,25 @@ color:#888;
 font-size:14px;
 }
 
+.horaSolicitacao{
+display:block;
+font-size:8px;
+font-weight:400;
+color:#555;
+margin-top:2px;
+}
+
+.tagNper{
+display:inline-block;
+background:#43a047;
+color:#fff;
+font-size:10px;
+font-weight:700;
+padding:2px 8px;
+border-radius:10px;
+letter-spacing:.5px;
+}
+
 </style>
 
 </head>
@@ -470,6 +489,7 @@ font-size:14px;
 <option value="ENG5003">
 
 <option value="SEM EQUIPE">
+<option value="NPER">
 
 <option value="LV">
 <option value="TP">
@@ -704,6 +724,24 @@ return "statusVerde";
 
 }
 
+function ehNper(eq){
+
+return (eq || "").trim().toUpperCase() === "NPER";
+
+}
+
+function formatarEquipe(eq){
+
+if(ehNper(eq)){
+
+return `<span class="tagNper">NPER</span>`;
+
+}
+
+return eq;
+
+}
+
 async function add(){
 
 if(!oc.value || !eq.value || !ci.value || !dataOc.value)
@@ -883,7 +921,7 @@ lista.innerHTML=dados.map((d,i)=>`
 
 <br>
 
-${d.eq}
+${formatarEquipe(d.eq)}
 
 </div>
 
@@ -952,6 +990,11 @@ let eqNormalizada =
 
 if(pendenciaCount.hasOwnProperty(eqNormalizada)){
 pendenciaCount[eqNormalizada]++;
+}
+
+// NPER não entra na contagem dos cards de Base nem de Tipo de Equipe (Obra/Manutenção)
+if(ehNper(d.eq)){
+return;
 }
 
 let processo=processos[d.eq];
@@ -1042,7 +1085,7 @@ ${gerarNumeroOcorrencia(d.oc,d.mes)}
 </div>
 
 <div>
-${d.eq}
+${formatarEquipe(d.eq)}
 </div>
 
 <div>
@@ -1069,6 +1112,7 @@ ${horasDecorridas(d.data,d.st)}h
 
 <div>
 ${new Date(d.data).toLocaleDateString()}
+<span class="horaSolicitacao">${String(new Date(d.data).getHours()).padStart(2,"0")}:${String(new Date(d.data).getMinutes()).padStart(2,"0")}</span>
 </div>
 
 </div>
@@ -1237,7 +1281,7 @@ listaOrdenada.map(d => `
 <span>OC: <b>${gerarNumeroOcorrencia(d.oc,d.mes)}</b></span>
 <span>Horas em aberto: <b>${horasDecorridas(d.data,d.st)}h</b></span>
 <span>UTD: <b>${d.utd}</b></span>
-<span>Equipe: <b>${d.eq}</b></span>
+<span>Equipe: <b>${formatarEquipe(d.eq)}</b></span>
 </div>
 
 <div class="obsTexto">${d.obs}</div>
